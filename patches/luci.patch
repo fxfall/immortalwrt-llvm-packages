@@ -1,0 +1,39 @@
+diff --git a/contrib/package/ucode-mod-html/Makefile b/contrib/package/ucode-mod-html/Makefile
+index 4ed2173..8785b1f 100644
+--- a/contrib/package/ucode-mod-html/Makefile
++++ b/contrib/package/ucode-mod-html/Makefile
+@@ -23,7 +23,7 @@ define Build/Configure
+ endef
+ 
+ define Build/Compile
+-	$(TARGET_CC) $(TARGET_CFLAGS) $(TARGET_LDFLAGS) $(FPIC) \
++	$(TARGET_CC) $(TARGET_CPPFLAGS) $(TARGET_CFLAGS) $(TARGET_LDFLAGS) $(FPIC) \
+ 		-Wall -ffunction-sections -Wl,--gc-sections -shared \
+ 		-o $(PKG_BUILD_DIR)/html.so $(PKG_BUILD_DIR)/html.c
+ endef
+diff --git a/contrib/package/ucode-mod-lua/Makefile b/contrib/package/ucode-mod-lua/Makefile
+index a793792..7d3c5c8 100644
+--- a/contrib/package/ucode-mod-lua/Makefile
++++ b/contrib/package/ucode-mod-lua/Makefile
+@@ -23,7 +23,7 @@ define Build/Configure
+ endef
+ 
+ define Build/Compile
+-	$(TARGET_CC) $(TARGET_CFLAGS) $(TARGET_LDFLAGS) $(FPIC) \
++	$(TARGET_CC) $(TARGET_CPPFLAGS) $(TARGET_CFLAGS) $(TARGET_LDFLAGS) $(FPIC) \
+ 		-Wall -ffunction-sections -Wl,--gc-sections -shared -Wl,--no-as-needed -llua \
+ 		-o $(PKG_BUILD_DIR)/lua.so $(PKG_BUILD_DIR)/lua.c
+ endef
+diff --git a/libs/rpcd-mod-luci/src/luci.c b/libs/rpcd-mod-luci/src/luci.c
+index 2abb5a8..eb5ab2e 100644
+--- a/libs/rpcd-mod-luci/src/luci.c
++++ b/libs/rpcd-mod-luci/src/luci.c
+@@ -1931,7 +1931,7 @@ rpc_luci_get_dhcp_leases(struct ubus_context *ctx, struct ubus_object *obj,
+                          struct ubus_request_data *req, const char *method,
+                          struct blob_attr *msg)
+ {
+-	char s[INET6_ADDRSTRLEN + strlen("/128")];
++	char s[INET6_ADDRSTRLEN + sizeof("/128") - 1];
+ 	struct blob_attr *tb[__RPC_L_MAX];
+ 	struct lease_entry *lease;
+ 	int af, family = 0;
