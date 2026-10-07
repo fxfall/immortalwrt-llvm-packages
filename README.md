@@ -5,9 +5,9 @@ https://github.com/fxfall/immortalwrt-llvm separate from the main
 ImmortalWrt source tree.
 
 The patches directory contains small diffs against the configured qmodem,
-luci, and packages feeds. Added package patch files are stored below
-feeds/<feed>/... using their original source-tree paths. Other feed files
-continue to come from the upstream feed repositories.
+luci, and packages feeds. Added package patch files mirror their original
+paths below the source tree's `feeds/` directory. Other feed files continue
+to come from the upstream feed repositories.
 
 Apply after updating configured feeds and before installing/building them:
 
