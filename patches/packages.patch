@@ -1,0 +1,47 @@
+diff --git a/libs/libwebsockets/Makefile b/libs/libwebsockets/Makefile
+index de11aad..9095878 100644
+--- a/libs/libwebsockets/Makefile
++++ b/libs/libwebsockets/Makefile
+@@ -24,7 +24,9 @@ PKG_LICENSE_FILES:=LICENSE
+ PKG_BUILD_DEPENDS:=libubox
+ 
+ # GCC 15 workaround for discarded-qualifiers warning
++ifneq ($(CONFIG_USE_LLVM_TOOLCHAIN),y)
+ TARGET_CFLAGS += -Wno-error=discarded-qualifiers
++endif
+ 
+ CMAKE_INSTALL:=1
+ 
+diff --git a/multimedia/tvheadend/Makefile b/multimedia/tvheadend/Makefile
+index a1d66b6..294a4bc 100644
+--- a/multimedia/tvheadend/Makefile
++++ b/multimedia/tvheadend/Makefile
+@@ -25,10 +25,11 @@ define Package/tvheadend
+   CATEGORY:=Multimedia
+   TITLE:=TV streaming server
+   MENU:=1
+-  USERID:=tvheadend:dvb
++  USERID:=tvheadend:dvb=49
+   URL:=https://tvheadend.org
+   MAINTAINER:=Marius Dinu <m95d+git@psihoexpert.ro>
+   DEPENDS:= \
++	+dvb-support \
+ 	+librt \
+ 	+libffi \
+ 	+libopenssl \
+diff --git a/utils/sane-backends/Makefile b/utils/sane-backends/Makefile
+index e60a530..96317cf 100644
+--- a/utils/sane-backends/Makefile
++++ b/utils/sane-backends/Makefile
+@@ -127,9 +127,9 @@ define Package/sane-daemon
+ $(call Package/sane-backends/Default)
+   SECTION:=utils
+   CATEGORY:=Utilities
+-  DEPENDS:=+libsane
++  DEPENDS:=+libsane +scanner-support
+   TITLE+= (network daemon)
+-  USERID:=saned:scanner
++  USERID:=saned:scanner=47
+ endef
+ 
+ define Package/sane-daemon/description

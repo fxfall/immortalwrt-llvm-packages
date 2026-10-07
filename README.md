@@ -4,9 +4,10 @@ This repository keeps the package/feed changes for
 https://github.com/fxfall/immortalwrt-llvm separate from the main
 ImmortalWrt source tree.
 
-The directory layout mirrors the source tree's feeds/<feed>/... paths.
-Only changed package files and added patches are included; upstream feed
-repositories remain the source of all other files.
+The patches directory contains small diffs against the configured qmodem,
+luci, and packages feeds. Added package patch files are stored below
+feeds/<feed>/... using their original source-tree paths. Other feed files
+continue to come from the upstream feed repositories.
 
 Apply after updating configured feeds and before installing/building them:
 

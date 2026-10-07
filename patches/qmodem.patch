@@ -1,0 +1,61 @@
+diff --git a/application/libqmodem-sms/src/pdu.c b/application/libqmodem-sms/src/pdu.c
+index 8b017ec..91ec000 100644
+--- a/application/libqmodem-sms/src/pdu.c
++++ b/application/libqmodem-sms/src/pdu.c
+@@ -332,7 +332,7 @@ EncodePhoneNumber(const char* phone_number, unsigned char* output_buffer, int bu
+ 	int i = 0;
+ 	for (; i < phone_number_length; ++i) {
+ 
+-		if (phone_number[i] < '0' && phone_number[i] > '9')
++		if (phone_number[i] < '0' || phone_number[i] > '9')
+ 			return -1;
+ 
+ 		if (i % 2 == 0) {
+@@ -378,7 +378,7 @@ pdu_encode(const char* service_center_number, const char* phone_number, const ch
+ 		output_buffer[1] = TYPE_OF_ADDRESS_INTERNATIONAL_PHONE;
+ 		length = EncodePhoneNumber(service_center_number,
+ 					   output_buffer + 2, buffer_size - 2);
+-		if (length < 0 && length >= 254)
++		if (length < 0 || length >= 254)
+ 			return -1;
+ 		length++;  // Add type of address.
+ 	}
+diff --git a/application/qmodem-seal/src/qmodem-seal.c b/application/qmodem-seal/src/qmodem-seal.c
+index e75cb65..8658cb3 100644
+--- a/application/qmodem-seal/src/qmodem-seal.c
++++ b/application/qmodem-seal/src/qmodem-seal.c
+@@ -34,6 +34,8 @@ static void usage(void)
+     exit(2);
+ }
+ 
++static void die(const char *message) __attribute__((noreturn));
++
+ static void die(const char *message)
+ {
+     fprintf(stderr, "qmodem-seal: %s\n", message);
+diff --git a/application/quectel_CM_5G_M/Makefile b/application/quectel_CM_5G_M/Makefile
+index c349c22..1f89f98 100644
+--- a/application/quectel_CM_5G_M/Makefile
++++ b/application/quectel_CM_5G_M/Makefile
+@@ -28,7 +28,7 @@ endef
+ 
+ define Build/Compile
+ 	$(MAKE) -C $(PKG_BUILD_DIR) \
+-		$(TARGET_CONFIGURE_OPTS) CFLAGS="$(TARGET_CFLAGS)"
++		$(TARGET_CONFIGURE_OPTS) CFLAGS="$(TARGET_CPPFLAGS) $(TARGET_CFLAGS)"
+ endef
+ 
+ define Package/$(PKG_NAME)/install
+diff --git a/application/tom_modem/Makefile b/application/tom_modem/Makefile
+index dfec371..3389989 100644
+--- a/application/tom_modem/Makefile
++++ b/application/tom_modem/Makefile
+@@ -42,7 +42,7 @@ endef
+ define Build/Compile
+ 	$(MAKE) -C $(PKG_BUILD_DIR) \
+ 		$(TARGET_CONFIGURE_OPTS) \
+-		CFLAGS="$(TARGET_CFLAGS) $(if $(CONFIG_PACKAGE_$(PKG_NAME)_ENABLE_UBUS_DAEMON),-DENABLE_UBUS_DAEMON)" \
++		CFLAGS="$(TARGET_CPPFLAGS) $(TARGET_CFLAGS) $(if $(CONFIG_PACKAGE_$(PKG_NAME)_ENABLE_UBUS_DAEMON),-DENABLE_UBUS_DAEMON)" \
+ 		ENABLE_UBUS_DAEMON=$(if $(CONFIG_PACKAGE_$(PKG_NAME)_ENABLE_UBUS_DAEMON),y,n)
+ endef
+ 
