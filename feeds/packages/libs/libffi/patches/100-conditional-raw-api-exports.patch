@@ -1,0 +1,26 @@
+--- a/libffi.map.in
++++ b/libffi.map.in
+@@ -28,10 +28,12 @@
+ 	ffi_prep_cif;
+ 	ffi_prep_cif_var;
+ 
++#if !FFI_NO_RAW_API
+ 	ffi_raw_call;
+ 	ffi_ptrarray_to_raw;
+ 	ffi_raw_to_ptrarray;
+ 	ffi_raw_size;
++#endif
+ 
+ #if !FFI_NATIVE_RAW_API
+ 	ffi_java_raw_call;
+@@ -63,8 +65,10 @@
+ 	ffi_closure_free;
+ 	ffi_prep_closure;
+ 	ffi_prep_closure_loc;
++#if !FFI_NO_RAW_API
+ 	ffi_prep_raw_closure;
+ 	ffi_prep_raw_closure_loc;
++#endif
+ #if !FFI_NATIVE_RAW_API
+ 	ffi_prep_java_raw_closure;
+ 	ffi_prep_java_raw_closure_loc;

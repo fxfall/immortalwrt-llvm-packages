@@ -1,0 +1,144 @@
+--- a/src/trace-tcp.c
++++ b/src/trace-tcp.c
+@@ -53,21 +53,20 @@
+ 	if (plen < sizeof (struct tcphdr))
+ 		plen = sizeof (struct tcphdr);
+ 
+-	struct
+-	{
+-		struct tcphdr th;
+-		uint8_t payload[plen - sizeof (struct tcphdr)];
+-	} packet;
+-
+-	memset (&packet, 0, sizeof (packet));
+-	packet.th.th_sport = sport;
+-	packet.th.th_dport = port;
+-	packet.th.th_seq = htonl ((ttl << 24) | (n << 16) | getpid ());
+-	packet.th.th_off = sizeof (packet.th) / 4;
+-	packet.th.th_flags = TH_SYN | (ecn ? (TH_ECE | TH_CWR) : 0);
+-	packet.th.th_win = htons (TCP_WINDOW);
+-
+-	return send_payload (fd, &packet, plen, ttl);
++	struct tcphdr th;
++	uint8_t packet[plen];
++
++	memset (packet, 0, plen);
++	memset (&th, 0, sizeof (th));
++	th.th_sport = sport;
++	th.th_dport = port;
++	th.th_seq = htonl ((ttl << 24) | (n << 16) | getpid ());
++	th.th_off = sizeof (th) / 4;
++	th.th_flags = TH_SYN | (ecn ? (TH_ECE | TH_CWR) : 0);
++	th.th_win = htons (TCP_WINDOW);
++	memcpy (packet, &th, sizeof (th));
++
++	return send_payload (fd, packet, plen, ttl);
+ }
+ 
+ 
+@@ -130,21 +129,20 @@
+ 	if (plen < sizeof (struct tcphdr))
+ 		plen = sizeof (struct tcphdr);
+ 
+-	struct
+-	{
+-		struct tcphdr th;
+-		uint8_t payload[plen - sizeof (struct tcphdr)];
+-	} packet;
+-
+-	memset (&packet, 0, sizeof (packet));
+-	packet.th.th_sport = sport;
+-	packet.th.th_dport = port;
+-	packet.th.th_ack = htonl ((ttl << 24) | (n << 16) | getpid ());
+-	packet.th.th_off = sizeof (packet.th) / 4;
+-	packet.th.th_flags = TH_ACK;
+-	packet.th.th_win = htons (TCP_WINDOW);
+-
+-	return send_payload (fd, &packet, plen, ttl);
++	struct tcphdr th;
++	uint8_t packet[plen];
++
++	memset (packet, 0, plen);
++	memset (&th, 0, sizeof (th));
++	th.th_sport = sport;
++	th.th_dport = port;
++	th.th_ack = htonl ((ttl << 24) | (n << 16) | getpid ());
++	th.th_off = sizeof (th) / 4;
++	th.th_flags = TH_ACK;
++	th.th_win = htons (TCP_WINDOW);
++	memcpy (packet, &th, sizeof (th));
++
++	return send_payload (fd, packet, plen, ttl);
+ }
+ 
+ 
+--- a/src/trace-icmp.c
++++ b/src/trace-icmp.c
+@@ -41,19 +41,18 @@
+ 	if (plen < sizeof (struct icmp6_hdr))
+ 		plen = sizeof (struct icmp6_hdr);
+ 
+-	struct
+-	{
+-		struct icmp6_hdr ih;
+-		uint8_t payload[plen - sizeof (struct icmp6_hdr)];
+-	} packet;
+-	memset (&packet, 0, plen);
++	struct icmp6_hdr ih;
++	uint8_t packet[plen];
+ 
+-	packet.ih.icmp6_type = ICMP6_ECHO_REQUEST;
+-	packet.ih.icmp6_id = htons (getpid ());
+-	packet.ih.icmp6_seq = htons ((ttl << 8) | (n & 0xff));
++	memset (packet, 0, plen);
++	memset (&ih, 0, sizeof (ih));
++	ih.icmp6_type = ICMP6_ECHO_REQUEST;
++	ih.icmp6_id = htons (getpid ());
++	ih.icmp6_seq = htons ((ttl << 8) | (n & 0xff));
+ 	(void)port;
++	memcpy (packet, &ih, sizeof (ih));
+ 
+-	return send_payload (fd, &packet.ih, plen, ttl);
++	return send_payload (fd, packet, plen, ttl);
+ }
+ 
+ 
+--- a/src/trace-udp.c
++++ b/src/trace-udp.c
+@@ -45,25 +45,24 @@
+ 	if (plen < sizeof (struct udphdr))
+ 		plen = sizeof (struct udphdr);
+ 
+-	struct
+-	{
+-		struct udphdr uh;
+-		uint8_t payload[plen - sizeof (struct udphdr)];
+-	} packet;
+-	memset (&packet, 0, plen);
++	struct udphdr uh;
++	uint8_t packet[plen];
+ 
++	memset (packet, 0, plen);
++	memset (&uh, 0, sizeof (uh));
+ 	(void)n;
+-	packet.uh.uh_sport = sport;
+-	packet.uh.uh_dport = htons (ntohs (port) + ttl);
++	uh.uh_sport = sport;
++	uh.uh_dport = htons (ntohs (port) + ttl);
+ 	/* For UDP-Lite we have full checksum coverage, if only because the
+ 	 * IPV6_CHECKSUM setsockopt only supports full coverage. Hence
+ 	 * we can set coverage to the length of the packet, even though zero
+ 	 * would be more idiosyncrasic. */
+-	packet.uh.uh_ulen = htons (plen);
+-	/*if (plen > sizeof (struct udphdr))
+-		packet.payload[0] = (uint8_t)ttl;*/
++	uh.uh_ulen = htons (plen);
++	/*if (plen > sizeof (uh))
++		packet[sizeof (uh)] = (uint8_t)ttl;*/
++	memcpy (packet, &uh, sizeof (uh));
+ 
+-	return send_payload (fd, &packet, plen, ttl);
++	return send_payload (fd, packet, plen, ttl);
+ }
+ 
+ 
